@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_keep_project/db/recipes_database.dart';
 import 'package:recipe_keep_project/model/recipe.dart';
+import 'package:recipe_keep_project/pages/BackendBloc.dart';
 import '../widget/recipe_form_widget.dart';
 
 class AddEditRecipePage extends StatefulWidget {
@@ -24,6 +26,7 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
   late String nutrition;
   late String tags;
   late String photo_name;
+  late String link;
 
   @override
   void initState() {
@@ -36,10 +39,13 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
     nutrition = widget.recipe?.nutrition ?? '';
     tags = widget.recipe?.tags ?? '';
     photo_name = widget.recipe?.photo_name ?? '';
+    link = widget.recipe?.link ?? '';
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    var backendBloc = BlocProvider.of<BackendBloc>(context);
+    return Scaffold(
     appBar: AppBar(
       actions: [buildButton()],
     ),
@@ -53,6 +59,7 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
         nutrition: nutrition,
         tags: tags,
         photo_name: photo_name,
+        link: link,
         onChangedFavorite: (isFavorite) =>
             setState(() => this.isFavorite = isFavorite),
         onChangedTitle: (title) =>
@@ -67,9 +74,12 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
             setState(() => this.tags = tags),
         onChangedPhoto_Name: (photo_name) =>
             setState(() => this.photo_name = photo_name),
+        onChangedLink: (link) =>
+            setState(() => this.link = link),
       ),
     ),
   );
+  }
 
   Widget buildButton() {
     final isFormValid = title.isNotEmpty && ingredients.isNotEmpty;
@@ -78,11 +88,13 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.purple,
           backgroundColor: isFormValid ? null : Colors.grey.shade700,
         ),
-        onPressed: addOrUpdateRecipe,
-        child: Text('Save'),
+        onPressed: () {
+          addOrUpdateRecipe();
+        },
+        child: const Text('Save'),
       ),
     );
   }
@@ -109,9 +121,10 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
       title: title,
       ingredients: ingredients,
       instructions: instructions,
-      nutrition: nutrition,
+      nutrition: await BlocProvider.of<BackendBloc>(context).fetchPredict(tags.split(',')),
       tags: tags,
       photo_name: photo_name,
+      link: link,
     );
 
     await RecipesDatabase.instance.update(recipe);
@@ -123,10 +136,11 @@ class _AddEditRecipePageState extends State<AddEditRecipePage> {
       isFavorite: isFavorite,
       ingredients: ingredients,
       instructions: instructions,
-      nutrition: nutrition,
+      nutrition: await BlocProvider.of<BackendBloc>(context).fetchPredict(tags.split(',')),
       tags: tags,
       photo_name: photo_name,
       createdTime: DateTime.now(),
+      link: link,
     );
 
     await RecipesDatabase.instance.create(recipe);

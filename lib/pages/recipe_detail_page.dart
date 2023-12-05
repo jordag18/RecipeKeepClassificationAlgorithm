@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_keep_project/model/Utility.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import '../db/recipes_database.dart';
 import '../model/recipe.dart';
 import 'edit_recipe_page.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RecipeDetailPage extends StatefulWidget {
   final int recipeId;
@@ -70,15 +74,34 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             ],
             ),
           ),
-          Container(child: Utility.imageFromBase64String(recipe.photo_name)),
-          //const SizedBox(height: 8),
+          if (recipe.photo_name != '') ...[Container(child: Utility.imageFromBase64String(recipe.photo_name))],
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Link:',
+              style: TextStyle(
+                color: Colors.white60,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            child: Text(
+              recipe.link,
+              style: const TextStyle(color: Colors.white70, fontSize: 18),
+            ),
+            onDoubleTap: () => _launchUrl(),
+          ),
+          const SizedBox(height: 8),
           //Text(DateFormat.yMMMd().format(note.createdTime), style: TextStyle(color: Colors.white38),),
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
               'Ingredients:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -94,7 +117,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Text(
               'Instructions:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -108,9 +131,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Nutrition:',
+              'Diet Tags:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -126,7 +149,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Text(
               'Tags:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -143,7 +166,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   );
 
   Widget editButton() => IconButton(
-      icon: const Icon(Icons.edit_outlined),
+      icon: const Icon(Icons.edit_outlined, color: Colors.white60),
       onPressed: () async {
         if (isLoading) return;
 
@@ -155,11 +178,17 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       });
 
   Widget deleteButton() => IconButton(
-    icon: const Icon(Icons.delete),
+    icon: const Icon(Icons.delete, color: Colors.white60),
     onPressed: () async {
       await RecipesDatabase.instance.delete(widget.recipeId);
 
       Navigator.of(context).pop();
     },
   );
+
+  _launchUrl() async {
+    if (!await launchUrl(Uri.parse("http://${recipe.link}"))) {
+      throw Exception('Could not launch ${Uri.parse(recipe.link)}');
+    }
+  }
 }

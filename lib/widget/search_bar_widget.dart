@@ -7,7 +7,7 @@ import '../pages/recipe_detail_page.dart';
 
 class searchBar extends SearchDelegate {
   late List<Recipe> recipes;
-  bool searchByTitle = true;
+  String searchBy = "Title";
 
   searchBar(this.recipes);
 
@@ -36,18 +36,22 @@ class searchBar extends SearchDelegate {
   List<Widget>? buildActions(BuildContext context) {
     return [
       PopupMenuButton(
-        initialValue: searchByTitle,
-        onSelected: (bool value) {
-          searchByTitle = value;
+        initialValue: searchBy,
+        onSelected: (value) {
+          searchBy = value;
         },
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<bool>>[
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
         const PopupMenuItem(
-          value: true,
+          value: 'title',
           child: Text('Search by Title'),
         ),
         const PopupMenuItem(
-          value: false,
+          value: "tags",
           child: Text('Search by Tags'),
+        ),
+        const PopupMenuItem(
+          value: 'diet',
+          child: Text('Search by Diet'),
         ),
       ],
         icon: const Icon(Icons.keyboard_control),
@@ -75,13 +79,18 @@ class searchBar extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     List<Recipe> matchQuery = [];
     for (var recipe in recipes) {
-      if (searchByTitle) {
+      if (searchBy == 'title') {
         if (recipe.title.toLowerCase().contains(query.toLowerCase())) {
           matchQuery.add(recipe);
         }
       }
-      else {
+      if (searchBy == 'tags') {
         if(recipe.tags.toLowerCase().contains(query.toLowerCase())) {
+          matchQuery.add(recipe);
+        }
+      }
+      else{
+        if(recipe.nutrition.toLowerCase().contains(query.toLowerCase())) {
           matchQuery.add(recipe);
         }
       }
@@ -94,13 +103,18 @@ class searchBar extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     List<Recipe> matchQuery = [];
     for (var recipe in recipes) {
-      if (searchByTitle) {
+      if (searchBy == 'title') {
         if (recipe.title.toLowerCase().contains(query.toLowerCase())) {
           matchQuery.add(recipe);
         }
       }
-      else {
+      if (searchBy == 'tags') {
         if(recipe.tags.toLowerCase().contains(query.toLowerCase())) {
+          matchQuery.add(recipe);
+        }
+      }
+      else{
+        if(recipe.nutrition.toLowerCase().contains(query.toLowerCase())) {
           matchQuery.add(recipe);
         }
       }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_keep_project/pages/BackendBloc.dart';
 import 'package:recipe_keep_project/pages/recipes_page.dart';
 
 Future main() async {
@@ -9,7 +11,17 @@ Future main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(MyApp());
+  runApp(
+    MultiBlocProvider(
+        providers: [
+          BlocProvider<BackendBloc>(
+            create: (context) =>
+                BackendBloc(),
+          )
+        ],
+        child: MyApp()
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -30,4 +42,5 @@ class MyApp extends StatelessWidget {
     ),
     home: RecipesPage(),
   );
+
 }

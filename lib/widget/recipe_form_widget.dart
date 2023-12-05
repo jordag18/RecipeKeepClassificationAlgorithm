@@ -10,6 +10,7 @@ class RecipeFormWidget extends StatelessWidget {
   final String? nutrition;
   final String? tags;
   final String? photo_name;
+  final String? link;
   final ValueChanged<bool> onChangedFavorite;
   final ValueChanged<String> onChangedTitle;
   final ValueChanged<String> onChangedIngredients;
@@ -17,6 +18,7 @@ class RecipeFormWidget extends StatelessWidget {
   final ValueChanged<String> onChangedNutrition;
   final ValueChanged<String> onChangedTags;
   final ValueChanged<String> onChangedPhoto_Name;
+  final ValueChanged<String> onChangedLink;
 
 
   const RecipeFormWidget({
@@ -28,6 +30,7 @@ class RecipeFormWidget extends StatelessWidget {
     this.nutrition = '',
     this.tags = '',
     this.photo_name = '',
+    this.link = '',
     required this.onChangedFavorite,
     required this.onChangedTitle,
     required this.onChangedIngredients,
@@ -35,6 +38,7 @@ class RecipeFormWidget extends StatelessWidget {
     required this.onChangedNutrition,
     required this.onChangedTags,
     required this.onChangedPhoto_Name,
+    required this.onChangedLink,
   }) : super(key: key);
 
   pickImageFromGallery() {
@@ -52,6 +56,7 @@ class RecipeFormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
+
     child: Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -62,7 +67,7 @@ class RecipeFormWidget extends StatelessWidget {
               const Text(
                 'Favorite',
                 style: TextStyle(
-                  color: Colors.white24,
+                  color: Colors.white60,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -79,6 +84,7 @@ class RecipeFormWidget extends StatelessWidget {
             Container(child: Utility.imageFromBase64String(photo_name!)),
           const SizedBox(height: 8),
           ElevatedButton(
+
               onPressed: () {
                 pickImageFromGallery();
                 },
@@ -86,13 +92,25 @@ class RecipeFormWidget extends StatelessWidget {
                 "Add Photo"
               ),
           ),
-
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Link:',
+              style: TextStyle(
+                color: Colors.white60,
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          buildLink(),
+          const SizedBox(height: 10),
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
               'Ingredients:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -105,7 +123,7 @@ class RecipeFormWidget extends StatelessWidget {
             child: Text(
               'Instructions:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -116,9 +134,9 @@ class RecipeFormWidget extends StatelessWidget {
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Nutrition:',
+              'Diet Tags:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -131,7 +149,7 @@ class RecipeFormWidget extends StatelessWidget {
             child: Text(
               'Tags:',
               style: TextStyle(
-                color: Colors.white24,
+                color: Colors.white60,
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
               ),
@@ -162,6 +180,18 @@ class RecipeFormWidget extends StatelessWidget {
         ? 'The title cannot be empty'
         : null,
     onChanged: onChangedTitle,
+  );
+
+  Widget buildLink() => TextFormField(
+    maxLines: 15,
+    initialValue: link,
+    style: const TextStyle(color: Colors.white60, fontSize: 18),
+    decoration: const InputDecoration(
+      border: InputBorder.none,
+      hintText: 'Type something...',
+      hintStyle: TextStyle(color: Colors.white60),
+    ),
+    onChanged: onChangedIngredients,
   );
 
   Widget buildIngredients() => TextFormField(
@@ -204,7 +234,7 @@ class RecipeFormWidget extends StatelessWidget {
       hintStyle: TextStyle(color: Colors.white60),
     ),
     validator: (title) => title != null && title.isEmpty
-        ? 'The nutrition cannot be empty'
+        ? 'The diet cannot be empty'
         : null,
     onChanged: onChangedNutrition,
   );

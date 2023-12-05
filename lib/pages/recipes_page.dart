@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:recipe_keep_project/db/recipes_database.dart';
 import 'package:recipe_keep_project/model/recipe.dart';
@@ -8,6 +9,10 @@ import 'package:recipe_keep_project/pages/randomizer_page.dart';
 import 'package:recipe_keep_project/pages/recipe_detail_page.dart';
 import '../widget/recipe_card_widget.dart';
 import '../widget/search_bar_widget.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'BackendBloc.dart';
 
 class RecipesPage extends StatefulWidget {
   @override
@@ -17,6 +22,8 @@ class RecipesPage extends StatefulWidget {
 class _RecipesPageState extends State<RecipesPage> {
   late List<Recipe> recipes;
   bool isLoading = false;
+  bool hasRun = false;
+  List<String> ingredients = ['egg', 'corn', 'onion', 'cheddar', 'cheese', 'crackers', 'butter'];
   List sortBy = ['DA','DD', 'AA', 'AD', 'F'];
   dynamic sortByChoice = 'AA';
   StreamController<int> selected = StreamController<int>();
@@ -24,7 +31,9 @@ class _RecipesPageState extends State<RecipesPage> {
   @override
   void initState() {
     super.initState();
-
+    if (!hasRun) {
+      getRecipesFromDatabase();
+    }
     refreshRecipes();
   }
 
@@ -43,16 +52,37 @@ class _RecipesPageState extends State<RecipesPage> {
     setState(() => isLoading = false);
   }
 
+  Future getRecipesFromDatabase() async {
+    setState(() => isLoading = true);
+    await BackendBloc().fetchData();
+    hasRun = true;
+    refreshRecipes();
+
+    setState(() => isLoading = false);
+  }
+
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final backendBloc = BlocProvider.of<BackendBloc>(context);
+    return Scaffold(
     appBar: AppBar(
+      iconTheme: const IconThemeData(
+        color: Colors.white60
+      ),
       title: const Text(
         'RecipeKeep',
-        style: TextStyle(fontSize: 24),
+        style: TextStyle(fontSize: 24, color: Colors.white),
         textAlign: TextAlign.center,
       ),
       actions: <Widget> [
+        IconButton(
+          tooltip: 'Refresh List',
+          icon: const Icon(Icons.refresh_outlined, color: Colors.white,),
+          onPressed: () async {
+            refreshRecipes();
 
+          },
+        ),
         IconButton(
             onPressed: () {
               showSearch(
@@ -75,7 +105,7 @@ class _RecipesPageState extends State<RecipesPage> {
           : buildNotes(),
     ),
     floatingActionButton: FloatingActionButton(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       child: const Icon(Icons.add),
       onPressed: () async {
         await Navigator.of(context).push(
@@ -88,6 +118,7 @@ class _RecipesPageState extends State<RecipesPage> {
     floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     bottomNavigationBar:_BottomAppBar(),
   );
+  }
 
   Widget _BottomAppBar() => BottomAppBar(
     shape: const CircularNotchedRectangle(),
@@ -128,6 +159,7 @@ class _RecipesPageState extends State<RecipesPage> {
             icon: const Icon(Icons.format_line_spacing),
           ),
           const Spacer(),
+          /*
           IconButton(
             tooltip: 'Random',
             icon: const Icon(Icons.album_rounded),
@@ -136,6 +168,8 @@ class _RecipesPageState extends State<RecipesPage> {
                   builder: (context) => RandomizerPage(recipes: recipes)));
             },
           ),
+
+           */
           const SizedBox(width: 125.0),
         ],
       ),

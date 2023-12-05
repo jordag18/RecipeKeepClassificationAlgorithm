@@ -38,7 +38,8 @@ CREATE TABLE $tableRecipes (
   ${RecipeFields.nutrition} $textType,
   ${RecipeFields.tags} $textType,
   ${RecipeFields.photo_name} $textType,
-  ${RecipeFields.time} $textType
+  ${RecipeFields.time} $textType,
+  ${RecipeFields.link} $textType
   )
 ''');
   }

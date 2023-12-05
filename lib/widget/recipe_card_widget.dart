@@ -87,11 +87,15 @@ class RecipeCardWidget extends StatelessWidget {
             ),
           ],
         ),
+
               const SizedBox(height: 8.0),
+              if (recipe.photo_name != "") ...[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(child: Utility.imageFromBase64String(recipe.photo_name)),
-              ),
+              ),]
+
+
             ],
         ),
       ),
